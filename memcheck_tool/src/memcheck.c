@@ -8,6 +8,7 @@
 void printHelp(void);
 void printAuthorInfo(void);
 
+// The LD_PRELOAD path is passed through a preprocessor variable from GCC cmd line (LD_OVERRIDE)
 static char *var = "LD_PRELOAD=TOSTRING(LD_OVERRIDE)";
 #define LD_PRELOAD "LD_PRELOAD=" TOSTRING(LD_OVERRIDE) 
 int
@@ -98,7 +99,7 @@ main (int argc, char **argv)
 		if(execute_allowed == 1)
 		{
 			putenv(LD_PRELOAD); // set ethe env to the libmemcheck
-			execl(program, ""); // execute the program
+			execl(program, program, NULL); // execute the program
 		}
 	}
 	else if (pid > 0)
