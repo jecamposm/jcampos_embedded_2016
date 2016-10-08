@@ -9,7 +9,6 @@ void printHelp(void);
 void printAuthorInfo(void);
 int fileExists(char *file);
 
-//static char *var = "LD_PRELOAD=/home/jo/Dropbox/TEC/III_2016/sistemas_empotrados/tarea1/malloc/libmy_malloc.so";
 static char *var = "LD_PRELOAD=TOSTRING(LD_OVERRIDE)";
 #define LD_PRELOAD "LD_PRELOAD=" TOSTRING(LD_OVERRIDE) 
 int
@@ -20,38 +19,57 @@ main (int argc, char **argv)
 	int p_used = 0;
 	int a_used = 0;
 	int h_used = 0;
+	int no_opt = 1;
 	int execute_allowed = 0;
   	opterr = 0;
 	
   	while ((c = getopt (argc, argv, "ahp:")) != -1)
-    switch (c)
     {
-    case 'a':
-		printAuthorInfo();
-		a_used = 1;
-		return;
-        break;
-      case 'h':
+		no_opt = 0;
+		switch (c)
+	    {
+	    case 'a':
+			a_used = 1;
+	        break;
+	      case 'h':
+			h_used = 1;
+	        break;
+	      case 'p':
+			p_used = 1;
+	        program = optarg;
+	        break;
+	      case '?':
+	        if (optopt == 'p')
+	          fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+	        else if (isprint (optopt))
+	          fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+	        else
+	          fprintf (stderr,
+	                   "Unknown option character `\\x%x'.\n",
+	                   optopt);
+	        return 1;
+	      default:
+	        abort ();
+	      }
+	}
+
+	if(no_opt == 1)
+	{
+		fprintf(stderr, "Error: No option specified\n");
+	}
+
+
+	if(h_used == 1)
+	{
 		printHelp();
-		return;
-        break;
-      case 'p':
-		p_used = 1;
-        program = optarg;
-        break;
-      case '?':
-        if (optopt == 'p')
-          fprintf (stderr, "Option -%c requires an argument.\n", optopt);
-        else if (isprint (optopt))
-          fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-        else
-          fprintf (stderr,
-                   "Unknown option character `\\x%x'.\n",
-                   optopt);
-        return 1;
-      default:
-        abort ();
-      }
+		return 0;
+	}
+
+	if(a_used == 1)
+	{
+		printAuthorInfo();
+		return 0;
+	}
 
 	if(p_used == 1 &&  access( program , X_OK ) == 0)
 	{
@@ -73,7 +91,7 @@ main (int argc, char **argv)
 	if(execute_allowed == 1)
 	{
 		putenv(LD_PRELOAD);
-		execl(program , "");
+		execl(program, "");
 	}
 
 }
@@ -89,5 +107,14 @@ Carne: 2016254354 \n\n \
 }
 
 void printHelp(void){
-	printf("Usage model\n");
+	char *help =\
+"\nUsage: ./memcheck [OPTIONS]\n\
+	Where OPTIONS are:\n\
+\n\
+	-a displays the information of the author of the program\n\
+	-h displays the usage message to let the user know how to execute the application.\n\
+	-p PROGRAM specifies the path to the program binary that will be analyzed, for example:\n\
+		./memcheck -p /home/myuser/buggy\n";
+
+	printf("%s\n" , help);
 }
