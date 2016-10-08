@@ -1,0 +1,10 @@
+Interpretacion de resultado:
+
+Despues de analizar programa buggy , se obtuvo:
+54 allocs
+45 frees
+9 leaks
+
+Ls 9 leaks representan un perdida de 144 bytes. De esos 9 leaks:
+	1 leak es perdida definitiva, de 16 bytes
+	8 leaks son perdida indirecta, con 128 bytes
